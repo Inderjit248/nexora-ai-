@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6fa">
+  <title>Your Study Plan | Nexora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body class="sora-body" data-section-url="{{ url_for('regenerate_section') }}" data-quiz-url="{{ url_for('start_quiz') }}" data-submit-url="{{ url_for('submit_quiz') }}">
+  <header class="sora-topbar">
+    <div class="topbar-left">
+      <a class="sora-brand" href="{{ url_for('index') }}" aria-label="Nexora home">
+        <span class="brand-icon-wrap">
+          <svg class="brand-book-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 26C16 26 12 23 4 23V6C12 6 16 9 16 9C16 9 20 6 28 6V23C20 23 16 26 16 26Z" fill="url(#brandGradRes)" stroke="#4338ca" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 9V26" stroke="#4338ca" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M16 2L17.2 4.8L20 6L17.2 7.2L16 10L14.8 7.2L12 6L14.8 4.8L16 2Z" fill="#6366f1"/>
+            <defs>
+              <linearGradient id="brandGradRes" x1="4" y1="6" x2="28" y2="26" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#818cf8"/>
+                <stop offset="1" stop-color="#4f46e5"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <span class="brand-text">Nexora</span>
+      </a>
+      <span class="brand-divider">|</span>
+      <span class="brand-tagline">AI Powered Learning</span>
+      <!-- Main Navigation -->
+      <nav class="nexora-nav" aria-label="Main Navigation">
+        <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+        <a href="{{ url_for('my_learning') }}" class="nav-link">My Learning</a>
+        <a href="{{ url_for('history_page') }}" class="nav-link">History</a>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <a class="button-outline" href="{{ url_for('index') }}">← New study plan</a>
+    </div>
+  </header>
+
+  <main class="result-shell">
+    <section class="result-heading">
+      <div>
+        <p class="eyebrow"><span class="eyebrow-line"></span> YOUR PERSONALIZED STUDY SET</p>
+        <h1>{{ study.input.topic }}</h1>
+        <p class="result-subtitle">{{ study.input.subject }} <span>·</span> {{ study.input.academic_level }} <span>·</span> {{ study.input.difficulty }}</p>
+      </div>
+      <div class="result-heading-actions"><span class="package-progress"><span class="progress-ring">✓</span><span>Study set ready<small>6 learning sections</small></span></span><a class="button button-outline" href="{{ url_for('index') }}">＋ New study set</a></div>
+    </section>
+
+    <section class="study-context" aria-label="Study settings">
+      <span><small>GOAL</small>{{ study.input.objective }}</span><span><small>LEARNING STYLE</small>{{ study.input.learning_style }}</span>
+      {% if study.input.material_name %}<span><small>STUDY MATERIAL</small>{{ study.input.material_name }}</span>{% endif %}
+      <span class="context-demo"><i></i> AI generated</span>
+    </section>
+
+    <div class="result-layout">
+      <section class="learning-grid" aria-label="Learning package">
+        {% set section_meta = [
+          ('learn', '01', '📖', 'Learn', 'A structured explanation, shaped around your goal'),
+          ('concepts', '02', '⭐', 'Important Concepts', 'Keep the essential ideas in view'),
+          ('examples', '03', '💡', 'Real-World Examples', 'Connect ideas to familiar situations'),
+          ('practice', '04', '📝', 'Practice Questions', 'Check your understanding as you go'),
+          ('flashcards', '05', '🃏', 'Flashcards', 'Quick prompts for active recall'),
+          ('revision', '06', '📅', 'Revision Plan', 'A practical, short review routine')
+        ] %}
+        {% for key, number, icon, title, description in section_meta %}
+        <article class="learning-card {% if key == 'learn' %}learn-card{% endif %}" data-section="{{ key }}">
+          <header class="learning-card-header"><div class="card-title-wrap"><span class="card-icon">{{ icon }}</span><div><p class="card-number">SECTION {{ number }}</p><h2>{{ title }}</h2></div></div><span class="card-status" aria-label="Ready">✓</span></header>
+          <p class="card-description">{{ description }}</p>
+          <div class="section-content" aria-live="polite">
+            {% if key == 'flashcards' %}
+              {% for item in study.package[key] %}<div class="flashcard"><p class="flashcard-question">{{ item.question }}</p><p class="flashcard-answer">{{ item.answer }}</p></div>{% endfor %}
+            {% else %}
+              <ul>{% for item in study.package[key] %}<li>{{ item }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+          <div class="card-actions"><button class="action-button regenerate-button" type="button" data-section="{{ key }}"><span aria-hidden="true">↻</span> Regenerate Section</button>{% if key == 'learn' %}<button class="action-button simplify-button" type="button" data-section="learn"><span aria-hidden="true">Aa</span> Explain More Simply</button>{% endif %}</div>
+        </article>
+        {% endfor %}
+      </section>
+
+      <aside class="quiz-column">
+        <section class="quiz-launch panel">
+          <div class="quiz-launch-icon">✳</div><p class="section-kicker">RECALL PRACTICE</p><h2>Ready to test<br>what stuck?</h2><p>Five quick questions. Get a score, explanations, and a focused review list.</p>
+          <button class="button button-dark" id="start-quiz" type="button"><span>Take Quiz</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+          <div class="quiz-details"><span>◷ About 3 min</span><span>·</span><span>5 questions</span></div>
+        </section>
+        <section class="weak-topics panel" id="weak-topics"><div class="weak-heading"><span>◎</span><div><p class="section-kicker">TOPICS TO REVIEW</p><h2>Your Weak Topics</h2></div></div><p class="weak-placeholder">Your review topics will appear here after you finish a quiz.</p></section>
+        <p class="result-disclaimer">AI-generated content should be reviewed before academic use.</p>
+      </aside>
+    </div>
+
+    <section class="quiz-panel panel" id="quiz-panel" hidden aria-live="polite"></section>
+    <footer class="page-footer"><span>AI STUDYMATE</span><span>Keep your learning focused and your progress moving.</span></footer>
+  </main>
+</body>
+</html>

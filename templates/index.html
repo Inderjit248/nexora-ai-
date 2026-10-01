@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6fa">
+  <title>Nexora | AI-Powered Study Companion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+
+<body class="nexora-body" data-chat-url="{{ url_for('chat') }}">
+  <!-- Top Navigation Bar -->
+  <header class="nexora-topbar">
+    <div class="topbar-left">
+      <a class="nexora-brand" href="{{ url_for('index') }}" aria-label="Nexora home">
+        <!-- Education + AI Logo: Open Book with AI Neural Sparkle -->
+        <span class="brand-logo-icon">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M18 28.5C18 28.5 13.5 25.5 4.5 25.5V7.5C13.5 7.5 18 10.5 18 10.5C18 10.5 22.5 7.5 31.5 7.5V25.5C22.5 25.5 18 28.5 18 28.5Z"
+              fill="url(#nexoraLogoGrad)" stroke="#4338ca" stroke-width="1.6" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M18 10.5V28.5" stroke="#4338ca" stroke-width="1.6" stroke-linecap="round" />
+            <!-- AI Neural Sparkle Core -->
+            <path d="M18 2.5L19.3 5.7L22.5 7L19.3 8.3L18 11.5L16.7 8.3L13.5 7L16.7 5.7L18 2.5Z" fill="#6366f1" />
+            <circle cx="9" cy="16.5" r="1.5" fill="#ffffff" opacity="0.9" />
+            <circle cx="27" cy="16.5" r="1.5" fill="#ffffff" opacity="0.9" />
+            <path d="M9 16.5L18 10.5L27 16.5" stroke="#c7d2fe" stroke-width="1" stroke-dasharray="1.5 1.5"
+              opacity="0.8" />
+            <defs>
+              <linearGradient id="nexoraLogoGrad" x1="4.5" y1="7.5" x2="31.5" y2="28.5" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#818cf8" />
+                <stop offset="0.5" stop-color="#6366f1" />
+                <stop offset="1" stop-color="#4f46e5" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <span class="brand-name">Nexora</span>
+      </a>
+
+      <!-- Main Navigation -->
+      <nav class="nexora-nav" aria-label="Main Navigation">
+        <a href="{{ url_for('index') }}" class="nav-link active">Home</a>
+        <a href="{{ url_for('my_learning') }}" class="nav-link">My Learning</a>
+        <a href="{{ url_for('history_page') }}" class="nav-link">History</a>
+        <button id="nav-progress-btn" class="nav-link nav-btn" type="button">Progress</button>
+      </nav>
+    </div>
+
+    <div class="topbar-right">
+      <span class="topbar-caption">Learning Workspace</span>
+    </div>
+  </header>
+
+  <main class="nexora-layout">
+    <!-- Left / Center: Main Chat Workspace -->
+    <div class="chat-workspace">
+      <!-- Hero Section -->
+      <section class="nexora-hero">
+        <div class="hero-sparkle-pill">
+          <span class="sparkle-star">✦</span>
+          <span>Personal AI Study Companion</span>
+        </div>
+        <h1 class="hero-brand">Nexora</h1>
+        <h2 class="hero-heading">Learn smarter. Understand better.</h2>
+        <p class="hero-tagline">Your AI-powered study companion.</p>
+        <div class="hero-highlight-line">🎯 Personalized to your level • goal • pace • weak areas</div>
+      </section>
+
+      <!-- Active Learning Context Pill (Dynamically updated) -->
+      <div id="active-context-bar" class="active-context-bar" hidden style="display: none;">
+        <span class="context-icon">💡</span>
+        <span class="context-label">Current Study Focus:</span>
+        <strong id="context-topic-name" class="context-topic">General Studies</strong>
+        <span id="context-subject-name" class="context-subject"></span>
+        <button id="clear-context-btn" class="context-clear" type="button" title="Reset focus topic">✕</button>
+      </div>
+
+      <!-- Chat Messages Container -->
+      <div id="chat-messages-container" class="chat-messages-container">
+        <!-- Initial Welcome Message Card -->
+        <article class="chat-bubble ai-bubble welcome-bubble">
+          <div class="bubble-avatar">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L13.8 7.2L19 9L13.8 10.8L12 16L10.2 10.8L5 9L10.2 7.2L12 2Z" fill="#6366f1" />
+            </svg>
+          </div>
+          <div class="bubble-content">
+            <div class="bubble-header">
+              <span class="bubble-author">Nexora</span>
+              <span class="bubble-time">Just now</span>
+            </div>
+            <div class="bubble-body">
+              <p>Hi! I'm <strong>Nexora</strong>, your AI study assistant. Tell me what you're working on today, and
+                I'll adapt to your studies automatically.</p>
+              <div class="intro-highlight-line">🎯 Personalized to your level • goal • pace • weak areas</div>
+              <ul class="welcome-features">
+                <li>📖 <strong>Explain any concept</strong> in simple or in-depth language</li>
+                <li>📝 <strong>Generate quizzes & flashcards</strong> from any topic or your syllabus</li>
+                <li>📌 <strong>Produce concise revision notes</strong> for upcoming exams</li>
+                <li>🎯 <strong>Solve practice problems</strong> with step-by-step guidance</li>
+              </ul>
+              <p class="welcome-prompt">Type any topic below or pick a suggestion to start!</p>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- File Attachment Bar (Shown only when a document/image is staged) -->
+      <div id="attachment-preview" class="attachment-preview" hidden style="display: none;">
+        <img id="attachment-thumb" class="attachment-thumb" alt="Attachment preview" hidden style="display: none;">
+        <span id="attachment-icon" class="attachment-icon">📎</span>
+        <span id="attachment-name" class="attachment-name"></span>
+        <span id="attachment-size" class="attachment-size"></span>
+        <button id="remove-attachment-btn" class="remove-attachment" type="button"
+          aria-label="Remove attachment">✕</button>
+      </div>
+
+      <!-- Chat Input Box -->
+      <div class="chat-input-wrapper">
+        <form id="chat-form" class="chat-form" autocomplete="off">
+          <input type="file" id="chat-file-input" name="study_material"
+            accept=".pdf,.txt,.png,.jpg,.jpeg,.webp,.gif,.bmp,image/*,application/pdf,text/plain" hidden>
+          <input type="file" id="camera-native-input" accept="image/*" capture="environment" hidden>
+
+          <button id="attach-file-btn" class="input-btn attach-btn" type="button"
+            title="Attach notes, document, or image (PDF, TXT, PNG, JPG, WEBP up to 5 MB)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path
+                d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+            </svg>
+          </button>
+
+          <button id="camera-btn" class="input-btn camera-btn" type="button"
+            title="Take photo of notes/questions with camera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </button>
+
+          <textarea id="chat-input" rows="1" placeholder="Enter a topic, syllabus, or upload study material — Nexora will create a personalized learning plan." required
+            maxlength="1500" class="chat-textarea"></textarea>
+
+          <button id="chat-send-btn" class="input-btn send-btn" type="submit" title="Send message">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+            </svg>
+          </button>
+        </form>
+
+        <!-- Suggestion Chips -->
+        <div class="suggestion-chips-container">
+          <span class="chips-label">Try asking:</span>
+          <div class="chips-list">
+            <button class="suggestion-chip" type="button"
+              data-prompt="Generate a complete personalized learning package with explanation, important concepts, real-world examples, practice questions, flashcards, and revision plan">
+              <span class="chip-sparkle">📚</span> Learning package
+            </button>
+            <button class="suggestion-chip" type="button"
+              data-prompt="Create a 5-minute quick revision session targeting my current topic and weak areas">
+              <span class="chip-sparkle">⏱️</span> 5m Quick Revision
+            </button>
+            <button class="suggestion-chip" type="button"
+              data-prompt="Analyze my performance and show my AI Study Path with Strong, Improving, and Weak topics, and what to study next">
+              <span class="chip-sparkle">🗺️</span> AI Study Path
+            </button>
+            <button class="suggestion-chip" type="button" data-prompt="Explain a topic in simple terms">
+              <span class="chip-sparkle">✦</span> Explain a topic
+            </button>
+            <button class="suggestion-chip" type="button"
+              data-prompt="Explain this topic with real-life examples and intuitive analogies to understand it easily">
+              <span class="chip-sparkle">💡</span> Real-life examples
+            </button>
+            <button class="suggestion-chip" type="button"
+              data-prompt="Create a quiz with 5 questions to test my understanding">
+              <span class="chip-sparkle">📝</span> Create a quiz
+            </button>
+            <button class="suggestion-chip" type="button" data-prompt="Make concise revision notes and key takeaways">
+              <span class="chip-sparkle">📌</span> Make revision notes
+            </button>
+            <button class="suggestion-chip" type="button"
+              data-prompt="Give me practice questions and exercises with solutions">
+              <span class="chip-sparkle">🎯</span> Practice questions
+            </button>
+            <button class="suggestion-chip" type="button"
+              data-prompt="Help me personalize my learning: ask me my academic level, exam goal, and daily study time to create a personalized study plan">
+              <span class="chip-sparkle">🎯</span> Personalize my learning
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right-Side Panel: Study Tools -->
+    <aside class="study-tools-sidebar">
+      <section class="tools-card" aria-labelledby="tools-heading">
+        <div class="tools-card-header">
+          <div class="tools-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </svg>
+          </div>
+          <div>
+            <h3 id="tools-heading" class="tools-card-title">Study Tools</h3>
+            <p class="tools-card-subtitle">Intelligent tools synced to your current study focus.</p>
+          </div>
+        </div>
+
+        <div class="tools-grid">
+          <!-- 0. LEARNING PACKAGE -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="package">
+            <div class="tool-badge badge-indigo">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10.392C3.057 14.68 4.245 14.39 5.5 14.39c1.472 0 2.882.477 4 1.304m0-10.89A7.968 7.968 0 0113.5 4c1.255 0 2.443.29 3.5.804v10.392c-1.057-.514-2.245-.804-3.5-.804-1.472 0-2.882.477-4 1.304m0-10.89v10.89" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">LEARNING PACKAGE</strong>
+              <p class="tool-desc">Generate complete 6-part study package for current topic.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+
+          <!-- 0b. QUICK REVISION -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="quick-revision">
+            <div class="tool-badge badge-amber">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">QUICK REVISION</strong>
+              <p class="tool-desc">5, 10, or 20-min focused sprint on current topic & weak areas.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+
+          <!-- 0c. AI STUDY PATH -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="study-path">
+            <div class="tool-badge badge-emerald">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.553.894l4 2A1 1 0 008 16V3.172L3.707 3.293zm10.586 0L10 1.586v12.828l4.293 2.146A1 1 0 0016 16V6a1 1 0 00-.553-.894l-1.154-.577z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">AI STUDY PATH</strong>
+              <p class="tool-desc">Analyze mastery: Strong 🟢, Improving 🟡, Weak 🔴 & Next Topic.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+
+          <!-- 1. QUICK QUIZ -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="quiz">
+            <div class="tool-badge badge-blue">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">QUICK QUIZ</strong>
+              <p class="tool-desc">Test yourself on what you're learning.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+
+          <!-- 2. PERSONALIZE MY LEARNING -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="personalize">
+            <div class="tool-badge badge-emerald">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 2a6 6 0 100 12 6 6 0 000-12zm0 3a3 3 0 100 6 3 3 0 000-6zm0 2a1 1 0 100 2 1 1 0 000-2z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">PERSONALIZE MY LEARNING</strong>
+              <p class="tool-desc">Set your level, exam goal &amp; study time to get a personalized plan.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+
+          <!-- 3. SMART NOTES -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="notes">
+            <div class="tool-badge badge-purple">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                <path fill-rule="evenodd"
+                  d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h6a1 1 0 100-2H7zm0 4a1 1 0 100 2h6a1 1 0 100-2H7z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">SMART NOTES</strong>
+              <p class="tool-desc">Turn a topic or study material into concise notes.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+
+          <!-- 4. FLASHCARDS -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="flashcards">
+            <div class="tool-badge badge-amber">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">FLASHCARDS</strong>
+              <p class="tool-desc">Create quick revision cards from your study material.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+
+          <!-- 5. PRACTICE -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="practice">
+            <div class="tool-badge badge-rose">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">PRACTICE</strong>
+              <p class="tool-desc">Generate questions and exercises for your topic.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+
+          <!-- 6. TIMETABLE PLANNER -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="timetable">
+            <div class="tool-badge badge-teal">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">TIMETABLE PLANNER</strong>
+              <p class="tool-desc">Create a personalized daily study & revision schedule.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+
+          <!-- 7. STUDY PROGRESS -->
+          <article class="tool-tile" role="button" tabindex="0" data-tool="progress">
+            <div class="tool-badge badge-indigo">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+              </svg>
+            </div>
+            <div class="tool-details">
+              <strong class="tool-name">STUDY PROGRESS</strong>
+              <p class="tool-desc">Track your learning activity and revision progress.</p>
+            </div>
+            <span class="tool-arrow">›</span>
+          </article>
+        </div>
+      </section>
+
+      <!-- Study Session Activity Summary Card -->
+      <section class="session-card" aria-label="Session summary">
+        <div class="session-header">
+          <span class="session-icon">📊</span>
+          <strong>Active Session</strong>
+        </div>
+        <div class="session-stats">
+          <div class="stat-box">
+            <span id="stat-topics-count" class="stat-number">0</span>
+            <span class="stat-label">Topics Explored</span>
+          </div>
+          <div class="stat-box">
+            <span id="stat-queries-count" class="stat-number">0</span>
+            <span class="stat-label">Queries Solved</span>
+          </div>
+        </div>
+        <p class="session-hint">💡 Nexora remembers your active topic so tools generate relevant study sets
+          automatically.</p>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Study Progress Modal Dialog -->
+  <dialog id="progress-modal" class="nexora-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">📈</span>
+          <div>
+            <h3>Your Study Progress</h3>
+            <p>Session overview & topic tracker</p>
+          </div>
+        </div>
+        <button id="close-modal-btn" class="modal-close-btn" type="button" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="progress-highlight">
+          <div class="highlight-item">
+            <small>CURRENT TOPIC</small>
+            <strong id="modal-current-topic">None yet</strong>
+          </div>
+          <div class="highlight-item">
+            <small>CURRENT SUBJECT</small>
+            <strong id="modal-current-subject">Not identified</strong>
+          </div>
+        </div>
+
+        <!-- 8. PROGRESS: Topic Mastery & Quiz Stats -->
+        <div class="progress-section">
+          <div class="mastery-header">
+            <span class="section-label">Overall Topic Mastery</span>
+            <span id="modal-mastery-text" class="mastery-val">0%</span>
+          </div>
+          <div class="mastery-track">
+            <div id="modal-mastery-bar" class="mastery-fill" style="width: 0%;"></div>
+          </div>
+          <div class="quiz-stat-row">
+            <div class="quiz-stat-pill">
+              <span class="pill-label">Quizzes Taken</span>
+              <strong id="modal-quizzes-count">0</strong>
+            </div>
+            <div class="quiz-stat-pill">
+              <span class="pill-label">Quiz Accuracy</span>
+              <strong id="modal-accuracy-rate">--%</strong>
+            </div>
+            <div class="quiz-stat-pill">
+              <span class="pill-label">Questions Attempted</span>
+              <strong id="modal-questions-count">0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. AI STUDY PATH -->
+        <div class="progress-section study-path-section">
+          <div class="study-path-header">
+            <h4>🗺️ Personalized AI Study Path</h4>
+            <span class="study-path-badge">AI Powered</span>
+          </div>
+
+          <div class="path-categorized-grid">
+            <!-- Strong Topics 🟢 -->
+            <div class="path-card path-card-strong">
+              <div class="path-card-title">
+                <span class="status-circle circle-green">🟢</span>
+                <strong>Strong Topics</strong>
+              </div>
+              <ul id="modal-strong-topics" class="path-topic-list">
+                <li class="path-empty-item">Take quizzes to identify strong topics.</li>
+              </ul>
+            </div>
+
+            <!-- Improving Topics 🟡 -->
+            <div class="path-card path-card-improving">
+              <div class="path-card-title">
+                <span class="status-circle circle-yellow">🟡</span>
+                <strong>Improving Topics</strong>
+              </div>
+              <ul id="modal-improving-topics" class="path-topic-list">
+                <li class="path-empty-item">Explore concepts to track improvement.</li>
+              </ul>
+            </div>
+
+            <!-- Weak Topics 🔴 -->
+            <div class="path-card path-card-weak">
+              <div class="path-card-title">
+                <span class="status-circle circle-red">🔴</span>
+                <strong>Weak Areas</strong>
+              </div>
+              <ul id="modal-weak-topics" class="path-topic-list">
+                <li class="path-empty-item">No weak areas identified yet. Great job!</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Recommended Next Topic to Study -->
+          <div id="modal-next-topic-box" class="recommended-next-box">
+            <div class="next-box-content">
+              <div class="next-tag">🎯 RECOMMENDED NEXT TOPIC TO STUDY</div>
+              <h4 id="modal-next-topic-name" class="next-topic-title">Explore Any Topic to Begin</h4>
+              <p id="modal-next-topic-reason" class="next-topic-reason">Nexora recommends following logical prerequisite concepts for mastery.</p>
+            </div>
+            <button id="modal-study-next-btn" class="btn-study-next" type="button">
+              <span>🚀</span> Study This Topic
+            </button>
+          </div>
+        </div>
+
+        <h4>All Topics Covered in This Session:</h4>
+        <ul id="modal-topics-list" class="topics-history-list">
+          <li class="empty-history">Start chatting to track topics here.</li>
+        </ul>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Camera Capture Modal Dialog -->
+  <dialog id="camera-modal" class="nexora-modal camera-modal">
+    <div class="modal-card camera-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">📷</span>
+          <div>
+            <h3>Capture Study Material</h3>
+            <p>Snap a photo of your notes, textbook, or problem</p>
+          </div>
+        </div>
+        <button id="close-camera-modal-btn" class="modal-close-btn" type="button" aria-label="Close camera">✕</button>
+      </div>
+      <div class="modal-body camera-modal-body">
+        <div class="camera-viewport">
+          <video id="camera-video" playsinline autoplay muted></video>
+          <canvas id="camera-canvas" hidden style="display: none;"></canvas>
+          <div id="camera-fallback" class="camera-fallback" hidden style="display: none;">
+            <p class="fallback-text">Camera stream unavailable or permission blocked.</p>
+            <label class="camera-upload-btn" for="camera-fallback-input">
+              📁 Choose photo from device
+            </label>
+            <input type="file" id="camera-fallback-input" accept="image/*" capture="environment" hidden>
+          </div>
+        </div>
+        <div class="camera-actions">
+          <button id="capture-photo-btn" class="capture-photo-btn" type="button">
+            <span class="shutter-icon"></span>
+            <span>Capture & Attach</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</body>
+
+</html>

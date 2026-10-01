@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6fa">
+  <title>Study History | Nexora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+
+<body class="nexora-body" data-page="history">
+  <!-- Top Navigation Bar (Home | My Learning | History | Progress) -->
+  <header class="nexora-topbar">
+    <div class="topbar-left">
+      <a class="nexora-brand" href="{{ url_for('index') }}" aria-label="Nexora home">
+        <!-- Education + AI Logo: Open Book with AI Neural Sparkle -->
+        <span class="brand-logo-icon">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M18 28.5C18 28.5 13.5 25.5 4.5 25.5V7.5C13.5 7.5 18 10.5 18 10.5C18 10.5 22.5 7.5 31.5 7.5V25.5C22.5 25.5 18 28.5 18 28.5Z"
+              fill="url(#nexoraLogoGrad)" stroke="#4338ca" stroke-width="1.6" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M18 10.5V28.5" stroke="#4338ca" stroke-width="1.6" stroke-linecap="round" />
+            <path d="M18 2.5L19.3 5.7L22.5 7L19.3 8.3L18 11.5L16.7 8.3L13.5 7L16.7 5.7L18 2.5Z" fill="#6366f1" />
+            <circle cx="9" cy="16.5" r="1.5" fill="#ffffff" opacity="0.9" />
+            <circle cx="27" cy="16.5" r="1.5" fill="#ffffff" opacity="0.9" />
+            <path d="M9 16.5L18 10.5L27 16.5" stroke="#c7d2fe" stroke-width="1" stroke-dasharray="1.5 1.5"
+              opacity="0.8" />
+            <defs>
+              <linearGradient id="nexoraLogoGrad" x1="4.5" y1="7.5" x2="31.5" y2="28.5" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#818cf8" />
+                <stop offset="0.5" stop-color="#6366f1" />
+                <stop offset="1" stop-color="#4f46e5" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <span class="brand-name">Nexora</span>
+      </a>
+
+      <!-- Main Navigation -->
+      <nav class="nexora-nav" aria-label="Main Navigation">
+        <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+        <a href="{{ url_for('my_learning') }}" class="nav-link">My Learning</a>
+        <a href="{{ url_for('history_page') }}" class="nav-link active">History</a>
+        <button id="nav-progress-btn" class="nav-link nav-btn" type="button">Progress</button>
+      </nav>
+    </div>
+
+    <div class="topbar-right">
+      <span class="topbar-caption">Session Activity</span>
+    </div>
+  </header>
+
+  <main class="history-container">
+    <!-- Header banner -->
+    <header class="history-header">
+      <div class="hero-sparkle-pill">
+        <span class="sparkle-star">🕒</span>
+        <span>Study Timeline</span>
+      </div>
+      <div class="history-title-row">
+        <div>
+          <h1 class="page-title">Study History</h1>
+          <p class="page-subtitle">Track your past questions, generated study packages, quiz results, and learning interactions.</p>
+        </div>
+        <button type="button" id="clear-all-history-btn" class="btn-clear-history" title="Clear all history entries">
+          <span>🗑️</span> Clear History
+        </button>
+      </div>
+    </header>
+
+    <!-- Search & Filter Controls -->
+    <section class="learning-controls-bar" aria-label="Filter study history">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" id="history-search-input" class="learning-search-input"
+          placeholder="Search study history by question, topic, or keyword..." autocomplete="off">
+        <button type="button" id="clear-history-search-btn" class="clear-search-btn" hidden title="Clear search">✕</button>
+      </div>
+
+      <div class="filter-pills-list">
+        <button type="button" class="filter-pill active" data-filter="all">All</button>
+        <button type="button" class="filter-pill" data-filter="queries">Queries</button>
+        <button type="button" class="filter-pill" data-filter="packages">Packages</button>
+        <button type="button" class="filter-pill" data-filter="quizzes">Quizzes</button>
+        <button type="button" class="filter-pill" data-filter="revisions">Revisions</button>
+        <button type="button" class="filter-pill" data-filter="timetables">Timetables</button>
+      </div>
+    </section>
+
+    <!-- History Items Grid -->
+    <section id="history-section" class="history-section" aria-live="polite">
+      <div class="section-meta-row">
+        <span id="history-count-indicator" class="saved-count-indicator">
+          Loading study history...
+        </span>
+      </div>
+
+      <div id="history-items-grid" class="history-grid">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+
+      <!-- Empty state -->
+      <div id="empty-history-state" class="empty-saved-state" hidden style="display: none;">
+        <div class="empty-icon-wrap">🕒</div>
+        <h3 class="empty-title">No Study History Yet</h3>
+        <p class="empty-desc">
+          Your asked questions, quizzes, and personalized learning packages will automatically appear here as you study.
+        </p>
+        <a href="{{ url_for('index') }}" class="btn-primary start-study-btn">
+          <span>✦</span> Start Learning with Nexora
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- History Response Viewer Modal Dialog -->
+  <dialog id="history-viewer-modal" class="nexora-modal package-viewer-modal">
+    <div class="modal-card viewer-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon" id="history-viewer-icon">🕒</span>
+          <div>
+            <h3 id="history-viewer-title">History Entry Title</h3>
+            <p id="history-viewer-meta">Topic • Date</p>
+          </div>
+        </div>
+        <div class="viewer-header-actions">
+          <button id="history-viewer-copy-btn" class="btn-ghost copy-btn" type="button" title="Copy content to clipboard">
+            📋 Copy
+          </button>
+          <button id="close-history-viewer-btn" class="modal-close-btn" type="button" aria-label="Close dialog">✕</button>
+        </div>
+      </div>
+      <div class="modal-body viewer-body">
+        <div id="history-viewer-prompt-box" class="history-prompt-box">
+          <span class="prompt-box-tag">YOUR QUESTION</span>
+          <p id="history-viewer-query" class="prompt-box-text"></p>
+        </div>
+        <div id="history-viewer-content" class="markdown-rendered"></div>
+      </div>
+      <div class="modal-footer viewer-footer">
+        <button id="history-viewer-close-footer-btn" class="btn-ghost" type="button">Close</button>
+        <a id="history-viewer-continue-chat-btn" href="{{ url_for('index') }}" class="btn-primary">
+          Ask Nexora Follow-up in Chat →
+        </a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Study Progress Modal Dialog -->
+  <dialog id="progress-modal" class="nexora-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">📈</span>
+          <div>
+            <h3>Your Study Progress</h3>
+            <p>Session overview & topic tracker</p>
+          </div>
+        </div>
+        <button id="close-modal-btn" class="modal-close-btn" type="button" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="progress-highlight">
+          <div class="highlight-item">
+            <small>CURRENT TOPIC</small>
+            <strong id="modal-current-topic">None yet</strong>
+          </div>
+          <div class="highlight-item">
+            <small>CURRENT SUBJECT</small>
+            <strong id="modal-current-subject">Not identified</strong>
+          </div>
+        </div>
+
+        <div class="progress-section">
+          <div class="mastery-header">
+            <span class="section-label">Overall Topic Mastery</span>
+            <span id="modal-mastery-text" class="mastery-val">0%</span>
+          </div>
+          <div class="mastery-track">
+            <div id="modal-mastery-bar" class="mastery-fill" style="width: 0%;"></div>
+          </div>
+          <div class="quiz-stat-row">
+            <div class="quiz-stat-pill">
+              <span class="pill-label">Quizzes Taken</span>
+              <strong id="modal-quizzes-count">0</strong>
+            </div>
+            <div class="quiz-stat-pill">
+              <span class="pill-label">Quiz Accuracy</span>
+              <strong id="modal-accuracy-rate">--%</strong>
+            </div>
+            <div class="quiz-stat-pill">
+              <span class="pill-label">Questions Attempted</span>
+              <strong id="modal-questions-count">0</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-section study-path-section">
+          <div class="study-path-header">
+            <h4>🗺️ Personalized AI Study Path</h4>
+            <span class="study-path-badge">AI Powered</span>
+          </div>
+
+          <div class="path-categorized-grid">
+            <div class="path-card path-card-strong">
+              <div class="path-card-title">
+                <span class="status-circle circle-green">🟢</span>
+                <strong>Strong Topics</strong>
+              </div>
+              <ul id="modal-strong-topics" class="path-topic-list">
+                <li class="path-empty-item">Take quizzes to identify strong topics.</li>
+              </ul>
+            </div>
+
+            <div class="path-card path-card-improving">
+              <div class="path-card-title">
+                <span class="status-circle circle-yellow">🟡</span>
+                <strong>Improving Topics</strong>
+              </div>
+              <ul id="modal-improving-topics" class="path-topic-list">
+                <li class="path-empty-item">Explore concepts to track improvement.</li>
+              </ul>
+            </div>
+
+            <div class="path-card path-card-weak">
+              <div class="path-card-title">
+                <span class="status-circle circle-red">🔴</span>
+                <strong>Weak Areas</strong>
+              </div>
+              <ul id="modal-weak-topics" class="path-topic-list">
+                <li class="path-empty-item">No weak areas identified yet. Great job!</li>
+              </ul>
+            </div>
+          </div>
+
+          <div id="modal-next-topic-box" class="recommended-next-box">
+            <div class="next-box-content">
+              <div class="next-tag">🎯 RECOMMENDED NEXT TOPIC TO STUDY</div>
+              <h4 id="modal-next-topic-name" class="next-topic-title">Explore Any Topic to Begin</h4>
+              <p id="modal-next-topic-reason" class="next-topic-reason">Nexora recommends following logical prerequisite concepts for mastery.</p>
+            </div>
+            <button id="modal-study-next-btn" class="btn-study-next" type="button">
+              <span>🚀</span> Study This Topic
+            </button>
+          </div>
+        </div>
+
+        <h4>All Topics Covered in This Session:</h4>
+        <ul id="modal-topics-list" class="topics-history-list">
+          <li class="empty-history">Start chatting to track topics here.</li>
+        </ul>
+      </div>
+    </div>
+  </dialog>
+</body>
+
+</html>
